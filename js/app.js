@@ -16,50 +16,50 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
-        
+
         // A nice, soft pop sound
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        
+
         osc.type = 'sine';
-        
+
         // Frequency sweep
         osc.frequency.setValueAtTime(400, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-        
+
         // Envelope
         gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
         gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.01);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        
+
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
+
         osc.start();
         osc.stop(audioCtx.currentTime + 0.15);
     }
 
     function playSparkleSound() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
+
         // Create a magical sparkle sweeping sound
         const rootFreq = 800;
         for (let i = 0; i < 5; i++) {
             setTimeout(() => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
+
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(rootFreq + (i * 200) + (Math.random()*100), audioCtx.currentTime);
+                osc.frequency.setValueAtTime(rootFreq + (i * 200) + (Math.random() * 100), audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(rootFreq * 2.5, audioCtx.currentTime + 0.3);
-                
+
                 gain.gain.setValueAtTime(0, audioCtx.currentTime);
                 gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                
+
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                
+
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.5);
             }, i * 60);
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchScreen(from, to, callback) {
         from.classList.remove('active');
         from.classList.add('hidden');
-        
+
         setTimeout(() => {
             to.classList.remove('hidden');
             // Trigger reflow
@@ -131,23 +131,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = element.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        
+
         for (let i = 0; i < 20; i++) {
             const spark = document.createElement('div');
             spark.className = 'spark';
             spark.style.left = `${centerX}px`;
             spark.style.top = `${centerY}px`;
-            
+
             const angle = Math.random() * Math.PI * 2;
             const distance = Math.random() * 150 + 50;
             const tx = Math.cos(angle) * distance;
             const ty = Math.sin(angle) * distance;
-            
+
             spark.style.setProperty('--tx', `${tx}px`);
             spark.style.setProperty('--ty', `${ty}px`);
-            
+
             document.body.appendChild(spark);
-            
+
             setTimeout(() => spark.remove(), 800);
         }
     }
@@ -156,10 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
     giftBtn.addEventListener('click', () => {
         playSparkleSound();
         createSparks(giftImg);
-        
+
         // Open animation for gift
         giftImg.classList.add('opening');
-        
+
         // Start background music
         bgMusic.volume = 0;
         bgMusic.play();
