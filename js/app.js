@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             switchScreen(screen1, screen2, () => {
                 initConfetti();
             });
-        }, 600);
+        }, 1200);
     });
 
     btnNext.addEventListener('click', () => {
