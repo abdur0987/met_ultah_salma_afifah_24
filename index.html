@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        softPink: '#FFD1DC',
+                        cream: '#FFFDD0',
+                        lavender: '#E6E6FA',
+                        roseDust: '#9E5B6A',
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        handwriting: ['Caveat', 'cursive'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #FFFDD0; 
+            overflow-x: hidden; 
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(255, 182, 193, 0.3);
+        }
+
+        .text-shadow-sm {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Gift Box CSS Animation */
+        .gift-container {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .gift-container:hover {
+            transform: scale(1.05);
+        }
+        .gift-box {
+            position: relative;
+            width: 150px;
+            height: 120px;
+            background-color: #ff6b81;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            transition: all 0.5s ease-in-out;
+        }
+        .gift-box::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 100%;
+            background-color: #fff;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .gift-lid {
+            position: absolute;
+            width: 170px;
+            height: 40px;
+            background-color: #ff4757;
+            border-radius: 5px;
+            top: -40px;
+            left: -10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            transition: all 0.5s ease-in-out;
+            transform-origin: bottom left;
+            z-index: 10;
+        }
+        .gift-lid::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 100%;
+            background-color: #f1f2f6;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .gift-ribbon {
+            position: absolute;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 40px;
+            transition: all 0.5s ease-in-out;
+            z-index: 11;
+        }
+        .gift-ribbon::before, .gift-ribbon::after {
+            content: '';
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            border: 5px solid #ff4757;
+            border-radius: 50% 50% 0 50%;
+        }
+        .gift-ribbon::before {
+            left: -10px;
+            transform: rotate(45deg);
+        }
+        .gift-ribbon::after {
+            right: -10px;
+            transform: rotate(135deg);
+        }
+        
+        .is-open .gift-lid {
+            transform: translateY(-50px) rotate(-15deg);
+            opacity: 0;
+        }
+        .is-open .gift-ribbon {
+            transform: translateX(-50%) translateY(-50px) scale(0);
+            opacity: 0;
+        }
+        .is-open .gift-box {
+            transform: scale(0.95);
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ffd700;
+            opacity: 0;
+            top: 50%;
+            left: 50%;
+        }
+
+        .is-open .sparkle {
+            animation: burst 1s forwards;
+        }
+
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Sunset Gradient */
+        .bg-sunset {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDD0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFD1DC;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffb6c1;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- SECTION 1: The Hook & Sweet Intro -->
+    <section id="section1" class="min-h-screen flex flex-col items-center justify-center relative bg-gradient-to-br from-softPink via-white to-cream overflow-hidden px-4">
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 left-0 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-float translate-x-[-50%] translate-y-[-50%]"></div>
+        <div class="absolute bottom-0 right-0 w-80 h-80 bg-lavender rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-float" style="animation-delay: 2s;"></div>
+
+        <div class="z-10 text-center max-w-lg mx-auto" data-aos="fade-down" data-aos-duration="1000">
+            <h1 class="font-handwriting text-4xl md:text-5xl lg:text-6xl text-roseDust mb-12 font-bold text-shadow-sm px-4">
+                Seseorang pernah bilang, hari ini bakal jadi hari yang luar biasa... Penasaran kenapa?
+            </h1>
+            
+            <p class="text-sm md:text-base text-gray-500 mb-16 italic">(Tap kadonya buat cari tau!)</p>
+
+            <div class="gift-container mt-16 animate-bounce-slow" id="giftBox">
+                <div class="gift-ribbon"></div>
+                <div class="gift-lid"></div>
+                <div class="gift-box">
+                    <div class="sparkle" style="--tx: -50px; --ty: -80px;"></div>
+                    <div class="sparkle" style="--tx: 50px; --ty: -90px; transition-delay: 0.1s;"></div>
+                    <div class="sparkle" style="--tx: -20px; --ty: -100px; transition-delay: 0.2s;"></div>
+                    <div class="sparkle" style="--tx: 30px; --ty: -60px; transition-delay: 0.15s;"></div>
+                    <div class="sparkle" style="--tx: 0px; --ty: -120px; transition-delay: 0.05s;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: The Heart of the Site -->
+    <section id="section2" class="min-h-screen py-20 px-4 flex flex-col items-center relative bg-[#fffaf0] overflow-hidden">
+        <!-- Floating hearts in background -->
+        <div class="absolute top-20 left-10 text-pink-300 opacity-50 animate-float text-3xl">💖</div>
+        <div class="absolute bottom-40 right-10 text-pink-300 opacity-50 animate-float text-4xl" style="animation-delay: 1.5s;">✨</div>
+        <div class="absolute top-1/2 left-5 text-pink-200 opacity-50 animate-wiggle text-2xl">🌸</div>
+
+        <!-- Lottie Cake -->
+        <div class="w-64 h-64 md:w-72 md:h-72 z-10 -mt-10" data-aos="zoom-in" data-aos-duration="1000">
+            <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_touohxv0.json" background="transparent" speed="1" loop autoplay></lottie-player>
+        </div>
+
+        <div class="z-10 text-center max-w-3xl mx-auto -mt-4 w-full" data-aos="fade-up" data-aos-delay="200">
+            <h2 class="font-handwriting text-5xl md:text-7xl text-pink-500 font-bold mb-8">
+                Happy Birthday [Nama Teman]! 🎂
+            </h2>
+            
+            <div class="glass-card rounded-3xl p-6 md:p-10 mb-16 shadow-lg transform transition duration-500 hover:scale-[1.02]">
+                <p class="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed font-medium">
+                    "Happy Birthday untuk manusia yang kadar manisnya ngalahin es kopi susu favorit kita! Makasih ya udah lahir ke dunia dan jadi bagian dari cerita hidup aku. Tetap jadi pribadi yang ceria, yang tawanya nular, dan yang selalu punya energi positif."
+                </p>
+            </div>
+
+            <!-- Bento Grid / Gallery -->
+            <h3 class="font-handwriting text-3xl md:text-4xl text-roseDust mb-8 font-bold" data-aos="fade-up">Gallery of Memories 📸</h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="300">
+                <!-- Most Beautiful Photo (Spans 2 rows if possible, or just large) -->
+                <div class="col-span-2 md:col-span-2 row-span-2 rounded-2xl overflow-hidden shadow-md group relative">
+                    <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=800&fit=crop" alt="Beautiful memory" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-pink-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <span class="text-white font-handwriting text-2xl">Cantik banget di sini! ✨</span>
+                    </div>
+                </div>
+                
+                <!-- Funny / Silly Photo -->
+                <div class="rounded-2xl overflow-hidden shadow-md group relative h-48 md:h-auto">
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=500&fit=crop" alt="Silly memory" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-pink-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <span class="text-white font-handwriting text-xl">Muka komuk 🤣</span>
+                    </div>
+                </div>
+
+                <!-- Sweet Moment -->
+                <div class="rounded-2xl overflow-hidden shadow-md group relative h-48 md:h-auto">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop" alt="Sweet memory" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-pink-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <span class="text-white font-handwriting text-xl">Love you! 💖</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: The Deep & Warm Wish -->
+    <section id="section3" class="min-h-screen bg-sunset flex flex-col items-center justify-center p-6 relative">
+        <div class="absolute inset-0 bg-white/20 backdrop-blur-[2px]"></div>
+        
+        <div class="z-10 max-w-2xl mx-auto text-center" data-aos="zoom-in-up" data-aos-duration="1500">
+            <div class="glass-card rounded-[40px] p-8 md:p-12 shadow-2xl relative border-t-2 border-l-2 border-white/60">
+                <!-- Quote marks -->
+                <div class="absolute top-4 left-6 text-6xl text-pink-300 opacity-50 font-serif">"</div>
+                <div class="absolute bottom-0 right-6 text-6xl text-pink-300 opacity-50 font-serif">"</div>
+                
+                <h3 class="font-handwriting text-3xl text-pink-600 mb-6 font-bold">A special wish for you...</h3>
+                
+                <p class="text-lg md:text-2xl text-gray-800 leading-relaxed font-medium">
+                    Doaku nggak muluk-muluk: Semoga semesta selalu baik sama kamu, semoga urusanmu dipermudah, dan semoga kamu selalu merasa cukup dengan dirimu sendiri.
+                </p>
+                <p class="text-xl md:text-3xl font-bold mt-8 text-roseDust font-handwriting">
+                    Kamu berharga, lebih dari yang kamu tahu.
+                </p>
+            </div>
+            
+            <div class="mt-16 animate-bounce">
+                <span class="text-4xl">🌻</span>
+            </div>
+            <p class="mt-4 text-white font-medium tracking-widest text-sm uppercase opacity-80">Forever your friend</p>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            once: true,
+            offset: 100,
+        });
+
+        // Interactive Gift Box Logic
+        const giftBox = document.getElementById('giftBox');
+        const bgMusic = document.getElementById('bgMusic');
+        let isOpened = false;
+
+        // Custom Heart Confetti
+        function fireConfetti() {
+            var defaults = { spread: 360, ticks: 100, gravity: 0.5, decay: 0.94, startVelocity: 30, shapes: ['heart'] };
+
+            function shoot() {
+                confetti({
+                    ...defaults,
+                    particleCount: 50,
+                    scalar: 2,
+                    colors: ['#ffc0cb', '#ff69b4', '#ff1493', '#db7093', '#fffdd0']
+                });
+                
+                confetti({
+                    ...defaults,
+                    particleCount: 25,
+                    scalar: 3,
+                    shapes: ['circle'],
+                    colors: ['#FFD700', '#FFA500']
+                });
+            }
+
+            setTimeout(shoot, 0);
+            setTimeout(shoot, 200);
+            setTimeout(shoot, 400);
+        }
+
+        giftBox.addEventListener('click', () => {
+            if (!isOpened) {
+                isOpened = true;
+                giftBox.classList.add('is-open');
+                
+                // Play Music
+                bgMusic.volume = 0.4;
+                bgMusic.play().catch(e => console.log("Audio play failed:", e));
+
+                // Wait for animation then scroll
+                setTimeout(() => {
+                    document.getElementById('section2').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Fire Confetti slightly after scrolling starts
+                    setTimeout(() => {
+                        fireConfetti();
+                    }, 500);
+                }, 800);
+            } else {
+                // Secondary clicks just scroll or do mini confetti
+                document.getElementById('section2').scrollIntoView({ behavior: 'smooth' });
+                confetti({
+                    particleCount: 30,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ff69b4', '#ff1493']
+                });
+            }
+        });
+
+        // Add intersection observer to section 2 to trigger confetti if scrolled manually
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && isOpened) {
+                    // Only trigger if manually scrolled back (optional logic)
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        observer.observe(document.getElementById('section2'));
+    </script>
+</body>
+</html>
