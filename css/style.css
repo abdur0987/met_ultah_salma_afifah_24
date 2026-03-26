@@ -170,9 +170,6 @@ html {
     cursor: pointer;
     z-index: 10;
     transition: transform 0.3s ease;
-}
-
-.css-gift:hover {
     animation: shakeBox 0.5s ease-in-out infinite alternate;
 }
 
